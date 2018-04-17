@@ -1,6 +1,7 @@
 import os
 import shutil
 import re
+from time import time
 
 
 def file_base_name(file_name):
@@ -48,6 +49,7 @@ def split_file(file_name: str, parts_num: int):
         os.mkdir(path + '/' + dir_name)
 
     parts = parts_sizes(file_size, parts_num)
+    time_start = time()
     with open(file_name, 'rb') as f:
         for ind, part_size in enumerate(parts, 1):
             cur_file_path = path + '/' + dir_name + '/' + file_base + str(ind) + split_file_ext
@@ -59,6 +61,7 @@ def split_file(file_name: str, parts_num: int):
 
     print('That\'s all!')
     print('Check "' + dir_name + '" folder')
+    print('Time elapsed: {:0.3f}s'.format(time() - time_start))
 
 
 def merge_parts(dir_name: str):
@@ -66,6 +69,7 @@ def merge_parts(dir_name: str):
     output_file = open(output_name, 'wb')
     path = os.getcwd()  # current path
     dir_name = path + '/' + dir_name
+    time_start = time()
     for ind, file_name in enumerate(os.listdir(dir_name), 1):
         with open(dir_name + '/' + file_name, 'rb') as f:
             output_file.write(f.read())
@@ -73,6 +77,7 @@ def merge_parts(dir_name: str):
     output_file.close()
     print('That\'s all!')
     print('output file: ' + output_name)
+    print('Time elapsed: {:0.3f}s'.format(time() - time_start))
 
 
 if __name__ == '__main__':
