@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 
 def file_base_name(file_name):
@@ -13,7 +14,7 @@ def parts_sizes(file_size, parts_num):
         + [file_size - (part * (parts_num - 1))]  # last size
 
 
-def main(file_name, parts_num):
+def split_file(file_name: str, parts_num: int):
 
     # check parts_num
     try:
@@ -34,7 +35,7 @@ def main(file_name, parts_num):
         print('No such file or directory')
         return
 
-    dir_name = file_base + '_split'
+    dir_name = file_name + '_split'
     split_file_ext = '.sfsplt'
 
     # make directory for split files
@@ -66,5 +67,11 @@ def main(file_name, parts_num):
     print('Check "' + dir_name + '" folder')
 
 
+def merge_parts(dir_name: str):
+    output_name = re.sub('_split$', '', dir_name)
+    print(output_name)
+
+
 if __name__ == '__main__':
-    main(file_name='file.avi', parts_num=9)
+    # split_file(file_name='file.avi', parts_num=9)
+    merge_parts('file.avi_split')
