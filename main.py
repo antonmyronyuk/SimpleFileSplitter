@@ -67,4 +67,4 @@ def main(file_name, parts_num):
 
 
 if __name__ == '__main__':
-    main(file_name='file.mp3', parts_num=9)
+    main(file_name='file.avi', parts_num=9)
