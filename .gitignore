@@ -8,6 +8,7 @@ startapp
 app.db
 .idea/
 file*
+merged*
 file_split/
 
 # C extensions

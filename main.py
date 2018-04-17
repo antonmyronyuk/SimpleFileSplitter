@@ -55,23 +55,33 @@ def split_file(file_name: str, parts_num: int):
     print(sum(parts_sizes(1345, 7)))
     '''
     parts = parts_sizes(file_size, parts_num)
-    with open(file_name, "rb") as f:
+    with open(file_name, 'rb') as f:
         for i in range(parts_num):
             chunk = f.read(parts[i])
             cur_file_path = path + '/' + dir_name + '/' + file_base + str(i) + split_file_ext
             output_file = open(cur_file_path, "wb")
             output_file.write(chunk)
             output_file.close()
+            print('Part {} - ready!'.format(i + 1))
 
     print('That\'s all!')
     print('Check "' + dir_name + '" folder')
 
 
 def merge_parts(dir_name: str):
-    output_name = re.sub('_split$', '', dir_name)
-    print(output_name)
+    output_name = 'merged_' + re.sub('_split$', '', dir_name)
+    output_file = open(output_name, 'wb')
+    print('output file: ' + output_name)
+    path = os.getcwd()  # current path
+    dir_name = path + '/' + dir_name
+    for ind, file in enumerate(os.listdir(dir_name), 1):
+        with open(dir_name + '/' + file, 'rb') as f:
+            output_file.write(f.read())
+            print('Part {} - merged!'.format(ind))
+    output_file.close()
+    print('That\'s all!')
 
 
 if __name__ == '__main__':
-    # split_file(file_name='file.avi', parts_num=9)
+    # split_file(file_name='file.avi', parts_num=7)
     merge_parts('file.avi_split')
