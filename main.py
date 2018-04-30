@@ -1,3 +1,4 @@
+import math
 import os
 import shutil
 import re
@@ -9,10 +10,14 @@ def file_base_name(file_name):
         else file_name.rsplit('.', 1)[0]
 
 
-def parts_sizes(file_size, parts_num):
-    part = file_size // parts_num
-    return [part for _ in range(parts_num - 1)]\
-        + [file_size - (part * (parts_num - 1))]  # last size
+def read_in_chunks(file_object, chunk_size=1024):
+    """Lazy function (generator) to read a file piece by piece.
+    Default chunk size: 1k."""
+    while True:
+        data = file_object.read(chunk_size)
+        if not data:
+            break
+        yield data
 
 
 def split_file(file_name: str, parts_num: int):
@@ -48,16 +53,25 @@ def split_file(file_name: str, parts_num: int):
     finally:
         os.mkdir(path + '/' + dir_name)
 
-    parts = parts_sizes(file_size, parts_num)
     time_start = time()
-    with open(file_name, 'rb') as f:
-        for ind, part_size in enumerate(parts, 1):
-            cur_file_path = path + '/' + dir_name + '/' + file_base + str(ind) + split_file_ext
-            output_file = open(cur_file_path, "wb")
-            # read and write
-            output_file.write(f.read(part_size))
+    with open(file_name, 'rb') as input_file:
+        chunk_size = 1024
+        pieces_in_file = math.ceil((file_size / chunk_size) / parts_num)
+        piece_ind = 0
+        file_ind = 1
+
+        # TODO: optimize there
+        for piece in read_in_chunks(input_file, chunk_size=chunk_size):
+            if piece_ind > pieces_in_file:
+                print('Part {} - ready!'.format(file_ind))
+                file_ind += 1
+                piece_ind = 0
+            cur_file_path = path + '/' + dir_name + '/' + file_base + str(file_ind) + split_file_ext
+            output_file = open(cur_file_path, "ab")
+            output_file.write(piece)
             output_file.close()
-            print('Part {} - ready!'.format(ind))
+            piece_ind += 1
+        print('Part {} - ready!'.format(file_ind))
 
     print('That\'s all!')
     print('Check "' + dir_name + '" folder')
@@ -70,9 +84,10 @@ def merge_parts(dir_name: str):
     path = os.getcwd()  # current path
     dir_name = path + '/' + dir_name
     time_start = time()
-    for ind, file_name in enumerate(os.listdir(dir_name), 1):
-        with open(dir_name + '/' + file_name, 'rb') as f:
-            output_file.write(f.read())
+    for ind, file_name in enumerate(sorted(os.listdir(dir_name)), 1):
+        with open(dir_name + '/' + file_name, 'rb') as input_file:
+            for piece in read_in_chunks(input_file, chunk_size=1024):
+                output_file.write(piece)
             print('Part {} - merged!'.format(ind))
     output_file.close()
     print('That\'s all!')
@@ -81,5 +96,5 @@ def merge_parts(dir_name: str):
 
 
 if __name__ == '__main__':
-    # split_file(file_name='file.avi', parts_num=7)
-    merge_parts('file.avi_split')
+    # split_file(file_name='file.mkv', parts_num=9)
+    merge_parts('file.mkv_split')
