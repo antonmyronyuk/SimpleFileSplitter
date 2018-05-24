@@ -47,9 +47,10 @@ def split_file(file_name: str, parts_num: int):
     try:
         # remove non empty dir
         shutil.rmtree(path + '/' + dir_name)
-        print('directory "' + dir_name + '" was replaced')
     except:
         print('directory "' + dir_name + '" was created')
+    else:
+        print('directory "' + dir_name + '" was replaced')
     finally:
         os.mkdir(path + '/' + dir_name)
 
@@ -66,7 +67,13 @@ def split_file(file_name: str, parts_num: int):
                 print('Part {} - ready!'.format(file_ind))
                 file_ind += 1
                 piece_ind = 0
-            cur_file_path = path + '/' + dir_name + '/' + file_base + str(file_ind) + split_file_ext
+            cur_file_path = path + '/' + dir_name + '/' + file_base \
+                            + str(file_ind) + split_file_ext
+
+            # splitting is really slow because of opening and
+            # closing of this file for every 1-kilobyte chunk
+            # f. e. merging is almost two times faster
+            # TODO: move opening/closing out of here
             output_file = open(cur_file_path, "ab")
             output_file.write(piece)
             output_file.close()
@@ -96,5 +103,5 @@ def merge_parts(dir_name: str):
 
 
 if __name__ == '__main__':
-    # split_file(file_name='file.mkv', parts_num=9)
     merge_parts('file.mkv_split')
+    # split_file(file_name='file.mkv', parts_num=9)
