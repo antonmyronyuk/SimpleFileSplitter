@@ -1,7 +1,7 @@
 import math
 import os
-import shutil
 import re
+import shutil
 from time import time
 
 
